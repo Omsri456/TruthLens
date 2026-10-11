@@ -8,7 +8,7 @@ as well as internal data structures for the verification pipeline.
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Optional
 
@@ -118,7 +118,7 @@ class VerificationReport(BaseModel):
     extracted_text: Optional[str] = None
     language: str = "en"
     claims: list[ClaimVerdict] = Field(default_factory=list)
-    created_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     error_message: Optional[str] = None
 
 

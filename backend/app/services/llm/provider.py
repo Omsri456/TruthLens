@@ -322,10 +322,17 @@ class LLMProvider:
 
         import PIL.Image
         import io
-        image = PIL.Image.open(io.BytesIO(image_bytes))
+        try:
+            image = PIL.Image.open(io.BytesIO(image_bytes))
+        except Exception as e:
+            raise ValueError(f"Uploaded file is not a valid image format: {e}")
 
-        response = self._model.generate_content([prompt, image])
-        text = response.text.strip() if response.text else ""
+        try:
+            response = self._model.generate_content([prompt, image])
+            text = response.text.strip() if response.text else ""
+        except Exception as e:
+            logger.error(f"Gemini vision call failed: {e}")
+            raise RuntimeError(f"Vision model failed to process image: {e}")
 
         if text == "[NO_TEXT_FOUND]":
             return ""

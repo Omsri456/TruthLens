@@ -318,22 +318,33 @@ export function VerifyPage() {
                 />
 
                 {file && (
-                  <div className="drop-zone-file">
-                    <FileText size={16} />
-                    <span className="drop-zone-file-name">
-                      {file.name} ({(file.size / 1024 / 1024).toFixed(1)} MB)
-                    </span>
-                    <button
-                      className="drop-zone-file-remove"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleFileSelect(null);
-                        if (fileInputRef.current) fileInputRef.current.value = '';
-                      }}
-                      aria-label="Remove file"
-                    >
-                      <X size={14} />
-                    </button>
+                  <div style={{ marginTop: 'var(--space-md)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                    {activeTab === 'image' && (
+                      <div style={{ maxWidth: 220, maxHeight: 160, overflow: 'hidden', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)', boxShadow: 'var(--shadow-sm)' }}>
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt="Upload preview"
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', maxHeight: 160 }}
+                        />
+                      </div>
+                    )}
+                    <div className="drop-zone-file">
+                      <FileText size={16} />
+                      <span className="drop-zone-file-name">
+                        {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
+                      <button
+                        className="drop-zone-file-remove"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFileSelect(null);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                        aria-label="Remove file"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

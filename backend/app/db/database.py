@@ -78,7 +78,7 @@ class EvidenceRecord(Base):
     source_title = Column(Text, nullable=True)
     publisher = Column(String, nullable=True)
     published_at = Column(String, nullable=True)
-    retrieved_at = Column(DateTime, default=datetime.utcnow)
+    retrieved_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
     snippet = Column(Text, nullable=True)
     relationship_type = Column(String, default="partially_relevant")
 
@@ -99,6 +99,10 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def init_db() -> None:
     """Create all tables if they don't exist."""
     Base.metadata.create_all(bind=engine)
+
+
+# Ensure tables exist upon database module load
+init_db()
 
 
 def get_db():

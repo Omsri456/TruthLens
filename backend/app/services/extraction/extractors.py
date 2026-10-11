@@ -25,11 +25,14 @@ logger = logging.getLogger(__name__)
 # ── PDF Extraction ──────────────────────────────────────────────────
 
 async def extract_text_from_pdf(file_bytes: bytes) -> str:
-    """Extract text from a PDF using PyMuPDF. Handles text-based PDFs."""
+    """Extract text from a PDF using PyMuPDF with text cleanup and scanned fallback."""
     try:
-        import fitz  # PyMuPDF
+        import pymupdf as fitz
     except ImportError:
-        raise RuntimeError("PyMuPDF is required for PDF processing. Install it with: pip install PyMuPDF")
+        try:
+            import fitz
+        except ImportError:
+            raise RuntimeError("PyMuPDF is required for PDF processing. Install it with: pip install PyMuPDF")
 
     try:
         doc = fitz.open(stream=file_bytes, filetype="pdf")
@@ -47,17 +50,38 @@ async def extract_text_from_pdf(file_bytes: bytes) -> str:
         page = doc.load_page(page_num)
         text = page.get_text("text")
         if text.strip():
-            text_parts.append(text.strip())
+            # Clean up hyphenated line breaks (e.g. "appro-\npriate" -> "appropriate")
+            cleaned = re.sub(r'(\w+)-\n(\w+)', r'\1\2', text.strip())
+            text_parts.append(cleaned)
+
+    full_text = "\n\n".join(text_parts).strip()
+
+    # If text is empty, check for scanned pages and try OCR if LLM is available
+    if not full_text and doc.page_count > 0:
+        from app.services.llm.provider import llm_provider
+        if llm_provider.is_available:
+            logger.info("PDF has no selectable text; attempting Gemini Vision OCR on first page(s)...")
+            ocr_parts = []
+            for page_num in range(min(doc.page_count, 3)):
+                page = doc.load_page(page_num)
+                pix = page.get_pixmap(dpi=150)
+                img_bytes = pix.tobytes("png")
+                try:
+                    ocr_text = await llm_provider.extract_text_from_image(img_bytes, "image/png")
+                    if ocr_text.strip():
+                        ocr_parts.append(ocr_text.strip())
+                except Exception as err:
+                    logger.warning(f"OCR failed on PDF page {page_num}: {err}")
+            if ocr_parts:
+                full_text = "\n\n".join(ocr_parts).strip()
 
     doc.close()
 
-    full_text = "\n\n".join(text_parts)
-
-    if not full_text.strip():
+    if not full_text:
         raise ValueError(
             "No readable text was extracted from this PDF. "
-            "It may be a scanned document (image-based PDF). "
-            "Try uploading it as an image instead."
+            "It appears to be a scanned document (image-based PDF). "
+            "Ensure GEMINI_API_KEY is configured for OCR or upload a screenshot directly."
         )
 
     # Truncate very long texts
