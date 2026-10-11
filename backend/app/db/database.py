@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import (
     Column,
@@ -44,7 +44,7 @@ class VerificationRecord(Base):
     language = Column(String, default="en")
     status = Column(String, default="pending")
     error_message = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc))
 
     claims = relationship("ClaimRecord", back_populates="verification", cascade="all, delete-orphan")
 

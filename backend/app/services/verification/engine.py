@@ -170,10 +170,10 @@ class VerificationEngine:
         supporting = [e for e in evidence if e.relationship == EvidenceRelationship.SUPPORTS]
         contradicting = [e for e in evidence if e.relationship == EvidenceRelationship.CONTRADICTS]
 
-        # ── Stage 5: Generate Explanation ────────────────────────
+        # ── Stage 5: Calibrate Verdict with Grounding Rules ───────
         verdict = analysis.get("verdict", Verdict.CANNOT_BE_CONFIRMED)
         assessment = analysis.get("evidence_assessment", EvidenceAssessment.INSUFFICIENT_EVIDENCE)
-        uncertainties = analysis.get("uncertainties", [])
+        uncertainties = list(analysis.get("uncertainties", []))
         key_findings = analysis.get("key_findings", "")
 
         # Ensure verdict and assessment are proper enum values
@@ -188,6 +188,31 @@ class VerificationEngine:
             except ValueError:
                 assessment = EvidenceAssessment.INSUFFICIENT_EVIDENCE
 
+        # Guardrail 1: VERIFIED requires at least 1 verified supporting evidence source
+        if verdict == Verdict.VERIFIED and len(supporting) == 0:
+            logger.warning(
+                f"Grounding violation: Verdict VERIFIED was assigned for '{claim_text[:40]}' "
+                "with 0 supporting evidence items. Overriding to CANNOT_BE_CONFIRMED."
+            )
+            verdict = Verdict.CANNOT_BE_CONFIRMED
+            assessment = EvidenceAssessment.INSUFFICIENT_EVIDENCE
+            uncertainties.append(
+                "Claim was downgraded to CANNOT_BE_CONFIRMED because no direct supporting evidence citations could be confirmed."
+            )
+
+        # Guardrail 2: FALSE requires either contradicting evidence or direct refutation
+        if verdict == Verdict.FALSE and len(contradicting) == 0 and len(supporting) == 0:
+            logger.info(
+                f"No direct contradicting evidence for '{claim_text[:40]}'. "
+                "Categorizing as CANNOT_BE_CONFIRMED due to absence of definitive refuting sources."
+            )
+            verdict = Verdict.CANNOT_BE_CONFIRMED
+            assessment = EvidenceAssessment.INSUFFICIENT_EVIDENCE
+            uncertainties.append(
+                "No authoritative sources explicitly contradicted this claim; public evidence is insufficient."
+            )
+
+        # ── Stage 6: Generate Grounded Explanation ────────────────
         explanation = await llm_provider.generate_explanation(
             claim_text=claim_text,
             verdict=verdict,

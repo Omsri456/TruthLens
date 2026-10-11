@@ -245,8 +245,19 @@ export function ReportPage() {
         </div>
       </div>
 
+      {/* Error or Notice Banner */}
+      {report.error_message && (
+        <div className={report.status === 'failed' ? 'error-message mb-lg' : 'info-message mb-lg'}>
+          <AlertCircle size={20} style={{ flexShrink: 0, marginTop: 2 }} />
+          <div>
+            <strong>{report.status === 'failed' ? 'Verification Notice' : 'System Note'}</strong>
+            <p style={{ marginTop: 4, margin: 0 }}>{report.error_message}</p>
+          </div>
+        </div>
+      )}
+
       {/* No Claims Case */}
-      {claimCount === 0 && (
+      {claimCount === 0 && !report.error_message && (
         <div className="card empty-state">
           <HelpCircle className="empty-state-icon" size={48} />
           <h2 className="empty-state-title">No verifiable claims identified</h2>

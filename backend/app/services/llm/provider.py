@@ -197,15 +197,31 @@ class LLMProvider:
         raise RuntimeError(f"LLM call failed after {max_retries + 1} attempts: {last_error}")
 
     def _parse_json_response(self, raw: str) -> dict:
-        """Extract JSON from LLM response, handling markdown code fences."""
+        """Extract JSON from LLM response, handling markdown code fences and extraneous text."""
+        import re
+
         text = raw.strip()
-        # Strip markdown code fences if present
-        if text.startswith("```"):
-            lines = text.split("\n")
-            # Remove first line (```json or ```) and last line (```)
-            lines = [l for l in lines if not l.strip().startswith("```")]
-            text = "\n".join(lines)
-        return json.loads(text)
+        # Extract content within code fences if present
+        if "```" in text:
+            match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", text)
+            if match:
+                text = match.group(1).strip()
+            else:
+                lines = [l for l in text.split("\n") if not l.strip().startswith("```")]
+                text = "\n".join(lines).strip()
+
+        # Find first '{' and matching last '}'
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            text = text[start : end + 1]
+
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            # Clean trailing commas
+            cleaned = re.sub(r",\s*([}\]])", r"\1", text)
+            return json.loads(cleaned)
 
     async def extract_claims(self, text: str, language: str = "en") -> ClaimExtractionResult:
         """Extract factual claims from user-submitted text."""
