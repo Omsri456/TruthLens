@@ -108,7 +108,10 @@ export function VerifyPage() {
       case 'text':
         return text.trim().length >= 10;
       case 'url':
-        return url.trim().length >= 10;
+        return (
+          url.trim().length >= 10 &&
+          (url.trim().startsWith('http://') || url.trim().startsWith('https://'))
+        );
       case 'image':
       case 'pdf':
       case 'audio':
@@ -325,6 +328,15 @@ export function VerifyPage() {
                           src={URL.createObjectURL(file)}
                           alt="Upload preview"
                           style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', maxHeight: 160 }}
+                        />
+                      </div>
+                    )}
+                    {activeTab === 'audio' && (
+                      <div style={{ width: '100%', maxWidth: 360, marginTop: 4 }}>
+                        <audio
+                          controls
+                          src={URL.createObjectURL(file)}
+                          style={{ width: '100%', height: 36, borderRadius: 8 }}
                         />
                       </div>
                     )}
