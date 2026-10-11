@@ -73,6 +73,7 @@ export interface HistoryEntry {
   input_type: InputType;
   claim_summary: string;
   verdict_summary?: string;
+  language?: string;
   created_at: string;
 }
 

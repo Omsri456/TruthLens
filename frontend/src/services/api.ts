@@ -149,6 +149,22 @@ export async function getHistory(): Promise<HistoryEntry[]> {
   }
 }
 
+export async function deleteVerification(id: string): Promise<void> {
+  try {
+    await api.delete(`/verification/${id}`);
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
+export async function clearHistory(): Promise<void> {
+  try {
+    await api.delete('/history');
+  } catch (error) {
+    throw new Error(getErrorMessage(error));
+  }
+}
+
 // ── Health Check ─────────────────────────────────────────────────
 
 export async function getHealth(): Promise<HealthResponse> {

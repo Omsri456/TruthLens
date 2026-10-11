@@ -179,7 +179,7 @@ export function ReportPage() {
       {/* Report Header */}
       <div className="report-header card mb-lg">
         <div style={{ flex: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8, flexWrap: 'wrap' }}>
             <span
               style={{
                 fontSize: '0.75rem',
@@ -193,6 +193,19 @@ export function ReportPage() {
               }}
             >
               Mode: {report.input_type}
+            </span>
+            <span
+              style={{
+                fontSize: '0.75rem',
+                fontWeight: 700,
+                letterSpacing: '0.03em',
+                color: 'var(--color-accent)',
+                background: 'var(--color-accent-light)',
+                padding: '2px 8px',
+                borderRadius: 4,
+              }}
+            >
+              Lang: {report.language === 'hi' ? 'Hindi (हिंदी)' : report.language === 'mr' ? 'Marathi (मराठी)' : 'English'}
             </span>
             <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>
               {new Date(report.created_at).toLocaleString()}

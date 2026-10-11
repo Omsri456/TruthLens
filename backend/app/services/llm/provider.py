@@ -143,6 +143,7 @@ Write the explanation in {language}. Follow these rules:
 5. Keep it concise (3-5 sentences).
 6. Do NOT add any facts not present in the evidence.
 7. If evidence is insufficient, say so clearly.
+8. If writing in Hindi or Marathi, use natural, grammatically correct Devanagari script. Keep numbers, official scheme names, and dates crystal clear so everyday citizens understand easily.
 
 Respond with ONLY valid JSON:
 {{
@@ -369,11 +370,11 @@ class LLMProvider:
 
     @staticmethod
     def _language_name(code: str) -> str:
-        """Map language code to full name."""
+        """Map language code to full descriptive prompt name."""
         mapping = {
             "en": "English",
-            "hi": "Hindi",
-            "mr": "Marathi",
+            "hi": "Hindi (हिंदी — write in natural, clear Devanagari script)",
+            "mr": "Marathi (मराठी — write in natural, clear Devanagari script)",
         }
         return mapping.get(code, "English")
 

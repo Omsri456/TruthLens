@@ -34,6 +34,8 @@ from app.services.extraction.extractors import (
 )
 from app.services.llm.provider import llm_provider
 from app.services.reporting.persistence import (
+    clear_history,
+    delete_verification,
     get_history,
     get_verification,
     save_verification,
@@ -252,3 +254,19 @@ async def get_verification_report(verification_id: str, db: Session = Depends(ge
 async def get_verification_history(db: Session = Depends(get_db)):
     """Get recent verification history."""
     return get_history(db)
+
+
+@router.delete("/verification/{verification_id}")
+async def delete_verification_report(verification_id: str, db: Session = Depends(get_db)):
+    """Delete a previously saved verification report."""
+    success = delete_verification(db, verification_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Verification report not found.")
+    return {"status": "deleted", "id": verification_id}
+
+
+@router.delete("/history")
+async def clear_verification_history(db: Session = Depends(get_db)):
+    """Clear all verification history."""
+    count = clear_history(db)
+    return {"status": "cleared", "count": count}

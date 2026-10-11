@@ -142,7 +142,25 @@ def get_history(db: Session, limit: int = 50) -> list[HistoryEntry]:
             input_type=r.input_type,
             claim_summary=summary,
             verdict_summary=verdict,
+            language=r.language or "en",
             created_at=r.created_at.isoformat() if r.created_at else "",
         ))
 
     return entries
+
+
+def delete_verification(db: Session, verification_id: str) -> bool:
+    """Delete a verification record and its associated claims/evidence."""
+    record = db.query(VerificationRecord).filter(VerificationRecord.id == verification_id).first()
+    if not record:
+        return False
+    db.delete(record)
+    db.commit()
+    return True
+
+
+def clear_history(db: Session) -> int:
+    """Delete all verification records. Returns count of deleted entries."""
+    count = db.query(VerificationRecord).delete()
+    db.commit()
+    return count

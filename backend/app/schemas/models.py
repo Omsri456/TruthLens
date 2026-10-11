@@ -86,7 +86,7 @@ class EvidenceItem(BaseModel):
     url: str
     publisher: Optional[str] = None
     published_at: Optional[str] = None
-    retrieved_at: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    retrieved_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     snippet: str
     relevance: Optional[float] = None
     source_type: Optional[str] = None
@@ -141,6 +141,7 @@ class HistoryEntry(BaseModel):
     input_type: InputType
     claim_summary: str
     verdict_summary: Optional[str] = None
+    language: Optional[str] = "en"
     created_at: str
 
 
