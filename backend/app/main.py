@@ -54,6 +54,19 @@ def create_app() -> FastAPI:
     # Routes
     app.include_router(router)
 
+    @app.get("/")
+    async def root():
+        return {
+            "name": "TruthLens AI",
+            "version": "1.0.0",
+            "docs": "/docs",
+            "health": "/api/v1/health",
+        }
+
+    @app.get("/health")
+    async def probe_health():
+        return {"status": "ok", "version": "1.0.0"}
+
     return app
 
 

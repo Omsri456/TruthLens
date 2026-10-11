@@ -1,0 +1,82 @@
+{
+  "metrics": {
+    "total_claims": 8,
+    "retrieval_recall_pct": 87.5,
+    "url_validity_pct": 100.0,
+    "snippet_clean_pct": 100.0
+  },
+  "detailed_results": [
+    {
+      "id": "claim_01",
+      "claim_text": "The World Health Organization officially declared the global eradication of smallpox in 1980.",
+      "category": "health",
+      "expected_verdict": "VERIFIED",
+      "retrieved_sources": 5,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    },
+    {
+      "id": "claim_02",
+      "claim_text": "NASA launched the James Webb Space Telescope into space on December 25, 2021.",
+      "category": "science",
+      "expected_verdict": "VERIFIED",
+      "retrieved_sources": 5,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    },
+    {
+      "id": "claim_03",
+      "claim_text": "Drinking boiled garlic water cures COVID-19 infection completely within 24 hours.",
+      "category": "health",
+      "expected_verdict": "FALSE",
+      "retrieved_sources": 1,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    },
+    {
+      "id": "claim_04",
+      "claim_text": "The Reserve Bank of India has announced that all 500 rupee currency notes will be discontinued from next Monday.",
+      "category": "finance",
+      "expected_verdict": "FALSE",
+      "retrieved_sources": 5,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    },
+    {
+      "id": "claim_05",
+      "claim_text": "Pluto is officially classified as the ninth planet of the Solar System.",
+      "category": "astronomy",
+      "expected_verdict": "OUTDATED",
+      "retrieved_sources": 7,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    },
+    {
+      "id": "claim_06",
+      "claim_text": "Wearing face masks is mandatory by law for all domestic air passengers on flights within India.",
+      "category": "travel",
+      "expected_verdict": "OUTDATED",
+      "retrieved_sources": 5,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    },
+    {
+      "id": "claim_07",
+      "claim_text": "The Eiffel Tower grows by 50 centimeters taller in the summer due to thermal expansion.",
+      "category": "architecture",
+      "expected_verdict": "PARTIALLY_SUPPORTED",
+      "retrieved_sources": 0,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    },
+    {
+      "id": "claim_08",
+      "claim_text": "A secret alien communication base is operated by scientists beneath the city of Pune.",
+      "category": "folklore",
+      "expected_verdict": "CANNOT_BE_CONFIRMED",
+      "retrieved_sources": 1,
+      "all_urls_valid": true,
+      "snippets_sanitized": true
+    }
+  ]
+}

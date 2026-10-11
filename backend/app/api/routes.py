@@ -251,9 +251,16 @@ async def get_verification_report(verification_id: str, db: Session = Depends(ge
 
 
 @router.get("/history", response_model=list[HistoryEntry])
-async def get_verification_history(db: Session = Depends(get_db)):
-    """Get recent verification history."""
-    return get_history(db)
+async def get_verification_history(
+    input_type: Optional[str] = None,
+    limit: int = 50,
+    db: Session = Depends(get_db),
+):
+    """Get recent verification history with optional media type filtering."""
+    entries = get_history(db, limit=limit)
+    if input_type:
+        return [e for e in entries if e.input_type == input_type]
+    return entries
 
 
 @router.delete("/verification/{verification_id}")

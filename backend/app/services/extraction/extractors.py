@@ -168,8 +168,13 @@ async def extract_text_from_url(url: str) -> dict:
             response = await client.get(
                 url,
                 headers={
-                    "User-Agent": "TruthLens-AI/1.0 (fact-checking-bot)",
-                    "Accept": "text/html,application/xhtml+xml",
+                    "User-Agent": (
+                        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                        "AppleWebKit/537.36 (KHTML, like Gecko) "
+                        "Chrome/124.0.0.0 Safari/537.36 (TruthLens/1.0; contact: admin@truthlens.ai)"
+                    ),
+                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                    "Accept-Language": "en-US,en;q=0.9",
                 },
             )
             response.raise_for_status()

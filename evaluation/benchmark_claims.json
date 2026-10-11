@@ -1,0 +1,66 @@
+[
+  {
+    "id": "claim_01",
+    "category": "health",
+    "claim_text": "The World Health Organization officially declared the global eradication of smallpox in 1980.",
+    "expected_verdict": "VERIFIED",
+    "expected_entities": ["World Health Organization", "smallpox", "1980"],
+    "ground_truth_context": "The 33rd World Health Assembly officially endorsed the global eradication of smallpox on 8 May 1980."
+  },
+  {
+    "id": "claim_02",
+    "category": "science",
+    "claim_text": "NASA launched the James Webb Space Telescope into space on December 25, 2021.",
+    "expected_verdict": "VERIFIED",
+    "expected_entities": ["NASA", "James Webb Space Telescope", "December 25, 2021"],
+    "ground_truth_context": "JWST was launched on an Ariane 5 rocket from Kourou, French Guiana, on December 25, 2021."
+  },
+  {
+    "id": "claim_03",
+    "category": "health",
+    "claim_text": "Drinking boiled garlic water cures COVID-19 infection completely within 24 hours.",
+    "expected_verdict": "FALSE",
+    "expected_entities": ["garlic water", "COVID-19", "24 hours"],
+    "ground_truth_context": "WHO and health authorities debunked this myth; garlic has mild antimicrobial properties but does not cure or treat coronavirus."
+  },
+  {
+    "id": "claim_04",
+    "category": "finance",
+    "claim_text": "The Reserve Bank of India has announced that all 500 rupee currency notes will be discontinued from next Monday.",
+    "expected_verdict": "FALSE",
+    "expected_entities": ["Reserve Bank of India", "500 rupee notes"],
+    "ground_truth_context": "PIB Fact Check and RBI have repeatedly clarified that valid Mahatma Gandhi series Rs 500 banknotes remain legal tender."
+  },
+  {
+    "id": "claim_05",
+    "category": "astronomy",
+    "claim_text": "Pluto is officially classified as the ninth planet of the Solar System.",
+    "expected_verdict": "OUTDATED",
+    "expected_entities": ["Pluto", "ninth planet", "Solar System"],
+    "ground_truth_context": "Pluto was considered the ninth planet until the International Astronomical Union (IAU) reclassified it as a dwarf planet in August 2006."
+  },
+  {
+    "id": "claim_06",
+    "category": "travel",
+    "claim_text": "Wearing face masks is mandatory by law for all domestic air passengers on flights within India.",
+    "expected_verdict": "OUTDATED",
+    "expected_entities": ["face masks", "domestic air passengers", "India"],
+    "ground_truth_context": "The Ministry of Civil Aviation made masks optional (though recommended) starting late 2022."
+  },
+  {
+    "id": "claim_07",
+    "category": "architecture",
+    "claim_text": "The Eiffel Tower grows by 50 centimeters taller in the summer due to thermal expansion.",
+    "expected_verdict": "PARTIALLY_SUPPORTED",
+    "expected_entities": ["Eiffel Tower", "50 centimeters", "thermal expansion"],
+    "ground_truth_context": "Thermal expansion does cause the Eiffel Tower to grow taller during hot summers, but only by about 15 centimeters (6 inches), not 50 centimeters."
+  },
+  {
+    "id": "claim_08",
+    "category": "folklore",
+    "claim_text": "A secret alien communication base is operated by scientists beneath the city of Pune.",
+    "expected_verdict": "CANNOT_BE_CONFIRMED",
+    "expected_entities": ["alien communication base", "Pune"],
+    "ground_truth_context": "There is no credible public scientific reporting or evidence confirming or refuting such an ungrounded rumor."
+  }
+]

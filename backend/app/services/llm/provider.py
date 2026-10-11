@@ -154,48 +154,83 @@ Respond with ONLY valid JSON:
 class LLMProvider:
     """Gemini-backed LLM provider for the verification pipeline."""
 
+    FALLBACK_MODELS = [
+        "gemini-3.5-flash",
+        "gemini-3.5-flash-lite",
+        "gemini-flash-lite-latest",
+        "gemini-3.8-flash",
+        "gemini-flash-latest",
+    ]
+
     def __init__(self):
         if not settings.is_llm_configured:
             logger.warning("Gemini API key not configured. LLM features will be unavailable.")
             self._model = None
+            self._current_model_name = settings.gemini_model
             return
 
         genai.configure(api_key=settings.gemini_api_key)
+        self._init_model(settings.gemini_model)
+
+    def _init_model(self, model_name: str):
+        """Initialize or switch the active generative model."""
+        self._current_model_name = model_name
         self._model = genai.GenerativeModel(
-            settings.gemini_model,
+            model_name,
             generation_config=genai.GenerationConfig(
                 temperature=0.1,  # Low variance for factual analysis
                 top_p=0.95,
                 max_output_tokens=4096,
             ),
         )
-        logger.info(f"LLM provider initialized with model: {settings.gemini_model}")
+        logger.info(f"LLM provider active model: {model_name}")
 
     @property
     def is_available(self) -> bool:
         return self._model is not None
 
-    def _call_llm(self, prompt: str, max_retries: int = 2) -> str:
-        """Send a prompt to the LLM with bounded retries."""
+    def _generate_content(self, contents, max_retries: int = 2) -> str:
+        """Call Gemini generate_content with automatic retry and multi-model quota fallback."""
         if not self.is_available:
             raise RuntimeError(
                 "LLM is not configured. Set GEMINI_API_KEY in your .env file."
             )
 
-        last_error = None
-        for attempt in range(max_retries + 1):
-            try:
-                response = self._model.generate_content(prompt)
-                if response.text:
-                    return response.text.strip()
-                raise ValueError("Empty response from LLM")
-            except Exception as e:
-                last_error = e
-                logger.warning(f"LLM call attempt {attempt + 1} failed: {e}")
-                if attempt == max_retries:
-                    break
+        candidate_models = [self._current_model_name] + [
+            m for m in self.FALLBACK_MODELS if m != self._current_model_name
+        ]
 
-        raise RuntimeError(f"LLM call failed after {max_retries + 1} attempts: {last_error}")
+        last_error = None
+        for model_name in candidate_models:
+            if self._current_model_name != model_name:
+                self._init_model(model_name)
+
+            for attempt in range(max_retries + 1):
+                try:
+                    response = self._model.generate_content(contents)
+                    if response.text:
+                        return response.text.strip()
+                    raise ValueError("Empty response from LLM")
+                except Exception as e:
+                    last_error = e
+                    err_msg = str(e).lower()
+                    # If model not found (404), deprecated, or quota exceeded (429), switch immediately
+                    if any(k in err_msg for k in ["404", "429", "quota", "not found", "no longer available", "resource_exhausted"]):
+                        logger.warning(
+                            f"Model '{model_name}' hit quota or unavailable ({e}). Seamlessly switching to next model..."
+                        )
+                        break
+                    logger.warning(f"LLM call with '{model_name}' attempt {attempt + 1} failed: {e}")
+                    if attempt == max_retries:
+                        break
+            else:
+                continue
+
+        raise RuntimeError(f"LLM call failed across all candidate models: {last_error}")
+
+    def _call_llm(self, prompt: str, max_retries: int = 2) -> str:
+        """Send a prompt to the LLM with bounded retries and model fallback."""
+        return self._generate_content(prompt, max_retries=max_retries)
 
     def _parse_json_response(self, raw: str) -> dict:
         """Extract JSON from LLM response, handling markdown code fences and extraneous text."""
