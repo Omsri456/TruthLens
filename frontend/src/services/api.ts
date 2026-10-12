@@ -10,7 +10,11 @@ import type {
   HealthResponse,
 } from '../types';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+let rawBase = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+if (!rawBase.endsWith('/api/v1')) {
+  rawBase = rawBase.replace(/\/+$/, '') + '/api/v1';
+}
+const API_BASE = rawBase;
 
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE,
