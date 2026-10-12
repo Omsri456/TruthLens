@@ -104,8 +104,10 @@ class VerificationEngine:
 
         # ── Stages 2–6: Per-claim verification ───────────────────
         claim_verdicts: list[ClaimVerdict] = []
+        # Cap to top 3 claims to ensure responsive latency and avoid free-tier rate limits
+        target_claims = extraction.claims[:3]
 
-        for claim in extraction.claims:
+        for claim in target_claims:
             try:
                 verdict = await self._verify_single_claim(claim.text, claim.claim_type, language)
                 verdict.claim_id = claim.claim_id
@@ -173,7 +175,16 @@ class VerificationEngine:
         # ── Stage 5: Calibrate Verdict with Grounding Rules ───────
         verdict = analysis.get("verdict", Verdict.CANNOT_BE_CONFIRMED)
         assessment = analysis.get("evidence_assessment", EvidenceAssessment.INSUFFICIENT_EVIDENCE)
-        uncertainties = list(analysis.get("uncertainties", []))
+        # Sanitize uncertainties to ensure every item is a string
+        raw_uncertainties = analysis.get("uncertainties", [])
+        uncertainties = []
+        for u in raw_uncertainties:
+            if isinstance(u, str):
+                uncertainties.append(u)
+            elif isinstance(u, dict):
+                uncertainties.append(str(u.get("point") or u.get("text") or u.get("description") or json.dumps(u)))
+            else:
+                uncertainties.append(str(u))
         key_findings = analysis.get("key_findings", "")
 
         # Ensure verdict and assessment are proper enum values

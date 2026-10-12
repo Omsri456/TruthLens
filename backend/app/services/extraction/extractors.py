@@ -215,8 +215,8 @@ async def extract_text_from_url(url: str) -> dict:
     if not text.strip():
         raise ValueError("No readable text could be extracted from the page.")
 
-    # Truncate
-    max_chars = 15000
+    # Truncate to keep verification prompt fast and focused
+    max_chars = 3500
     if len(text) > max_chars:
         text = text[:max_chars] + "\n\n[Text truncated due to length limits]"
 
