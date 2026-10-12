@@ -1,0 +1,25 @@
+﻿services:
+  # Backend FastAPI Service
+  - type: web
+    name: truthlens-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.5-flash
+      - key: CORS_ORIGINS
+        value: "*"
+
+  # Frontend Vite React Static Site
+  - type: web
+    name: truthlens-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./dist
